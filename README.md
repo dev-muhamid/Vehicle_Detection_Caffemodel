@@ -18,7 +18,7 @@ This project utilizes a Convolutional Neural Network (CNN) to detect vehicles in
 - playsound module
 - OS
 - threading
-
+- time 
 ## Installation
 
 1. Clone the repository:
