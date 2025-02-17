@@ -39,6 +39,9 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
+# Define a constant factor for distance calculation
+constant_factor = 45
+
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -74,7 +77,10 @@ while True:
                     vehicle_detected_close = True
 
                 # Draw the bounding box and label on the frame
-                distance = (endX - startX) / 2  # Assuming the distance is proportional to the bounding box width
+                object_width = endX - startX
+                distance = constant_factor / object_width
+                # Convert the distance from meters to centimeters
+                distance_cm = distance * 100
                 label = "{}: {:.2f}%".format(CLASSES[idx], confidence * 100)
                 cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
                 y = startY - 15 if startY - 15 > 15 else startY + 15
