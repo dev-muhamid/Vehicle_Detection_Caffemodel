@@ -3,6 +3,7 @@ import numpy as np
 import os
 from playsound import playsound
 import threading
+import time
 
 
 
@@ -47,6 +48,13 @@ def smooth_box(prev_box, current_box, alpha=1.0):
     if prev_box is None:
         return current_box
     return (1 - alpha) * np.array(prev_box) + alpha * np.array(current_box)
+
+def play_alert_sound():
+    global alert_sound_playing, alert_sound_play_count
+    for _ in range(3):
+        playsound(alert_sound)
+    time.sleep(30)
+    alert_sound_playing = False
 
 while True:
     # Capture frame-by-frame
@@ -106,21 +114,18 @@ while True:
     # Display the resulting frame
     cv2.imshow("Vehicle Detection", frame)
 
-    # Play sound if a vehicle is detected too close
-    if cv2.waitKey(1) & 0xFF == ord ('o'):
-        if vehicle_detected_close:        
-            cv2.putText(frame, "Do Not Open The Door, ", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            if not alert_sound_playing:
-                
-                if alert_sound_play_count <3:
-                    threading.Thread(target=playsound, args=(alert_sound,)).start()                 
-                    alert_sound_playing = True 
-                    alert_sound_play_count += 1        
-            else:
-                alert_sound_playing = False
+    # Check for key presses
+    key = cv2.waitKey(1) & 0xFF
+
+    # Play sound if 'o' is pressed and a vehicle is detected too close
+    if key == ord('o') and vehicle_detected_close:
+        cv2.putText(frame, "Do Not Open The Door", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        if not alert_sound_playing:
+            threading.Thread(target=play_alert_sound).start()
+            alert_sound_playing = True
 
     # Break the loop if 'q' is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if key == ord('q'):
         break
 
 # Release the video capture object and close all OpenCV windows
