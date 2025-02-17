@@ -42,6 +42,12 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 # Define a constant factor for distance calculation
 constant_factor = 45
 
+prev_box = None
+def smooth_box(prev_box, current_box, alpha=1.0):
+    if prev_box is None:
+        return current_box
+    return (1 - alpha) * np.array(prev_box) + alpha * np.array(current_box)
+
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -70,6 +76,11 @@ while True:
                 box = detections[0, 0, i, 3:7] * np.array([frame.shape[1], frame.shape[0], frame.shape[1], frame.shape[0]])
                 (startX, startY, endX, endY) = box.astype("int")
 
+                # Smoothing the bounding box
+                if prev_box is not None:
+                    smoothed_box = smooth_box(prev_box, (startX, startY, endX, endY))
+                    (startX, startY, endX, endY) = smoothed_box.astype("int")
+
                 # Check if the detected vehicle is too close (e.g., taking up more than a certain percentage of the frame)
                 box_area = (endX - startX) * (endY - startY)
                 frame_area = frame.shape[0] * frame.shape[1]
@@ -86,6 +97,9 @@ while True:
                 y = startY - 15 if startY - 15 > 15 else startY + 15
                 cv2.putText(frame, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 cv2.putText(frame, "Distance: {:.2f}m".format(distance), (10, startY - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+                # Update previous box
+                prev_box = (startX, startY, endX, endY)
     # Flip the frame horizontally
     #frame = cv2.flip(frame, 1)
 
