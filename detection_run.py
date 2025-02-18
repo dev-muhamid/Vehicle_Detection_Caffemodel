@@ -13,7 +13,7 @@ model_file = 'mobilenet_iter_73000.caffemodel'
 
 
 # Sound file for alert
-alert_sound = '</path to alert sound>/Alert.mp3'
+alert_sound = 'Alert.mp3' # Change this to the path of the alert sound file
 alert_sound_playing = False
 alert_sound_play_count=0
 
@@ -44,7 +44,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 constant_factor = 45
 
 prev_box = None
-def smooth_box(prev_box, current_box, alpha=1.0):
+def smooth_box(prev_box, current_box, alpha=0.5): # Smoothing factor should be (0 < alpha < 1)..can be adjusted
     if prev_box is None:
         return current_box
     return (1 - alpha) * np.array(prev_box) + alpha * np.array(current_box)
@@ -112,7 +112,7 @@ while True:
     #frame = cv2.flip(frame, 1)
 
     # Display the resulting frame
-    cv2.imshow("Vehicle Detection", frame)
+    cv2.imshow("Traffic Detection", frame)
 
     # Check for key presses
     key = cv2.waitKey(1) & 0xFF
