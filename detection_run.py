@@ -13,7 +13,7 @@ model_file = 'mobilenet_iter_73000.caffemodel'
 
 
 # Sound file for alert
-alert_sound = 'Alert.mp3' # Change this to the path of the alert sound file
+alert_sound = 'Alert.mp3'
 alert_sound_playing = False
 alert_sound_play_count=0
 
